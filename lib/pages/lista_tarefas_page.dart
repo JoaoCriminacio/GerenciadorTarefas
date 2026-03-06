@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gerenciador_tarefas/model/tarefa.dart';
+import 'package:gerenciador_tarefas/pages/filtro_page.dart';
 import 'package:gerenciador_tarefas/widget/conteudo_form_dialog.dart';
 
 class ListaTarefasPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
       title: const Text('Tarefas'),
       actions: [
         IconButton(
-            onPressed: (){},
+            onPressed: _abrirFiltro,
             icon: const Icon(Icons.list),
         )
       ],
@@ -143,6 +144,15 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
           );
         }
     );
+  }
+
+  void _abrirFiltro() {
+    final navigator = Navigator.of(context);
+    navigator.pushNamed(FiltroPage.ROUTE_NAME).then((alterouValores) {
+      if (alterouValores == true) {
+
+      }
+    });
   }
 
   void _abrirForm({ Tarefa? tarefaAtual, int? indice }) {
