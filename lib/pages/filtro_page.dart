@@ -2,6 +2,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gerenciador_tarefas/model/tarefa.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class FiltroPage extends StatefulWidget {
   static const ROUTE_NAME = '/filtro';
@@ -26,6 +27,24 @@ class _FiltroPageState extends State<FiltroPage> {
   bool usarOrdemDecrescente = false;
   bool alterouValores = false;
 
+  late final SharedPreferences prefs;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarSharedPreferences();
+  }
+
+  void _carregarSharedPreferences() async {
+    prefs = await SharedPreferences.getInstance();
+
+    setState(() {
+      campoOrdenacao = prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? Tarefa.CAMPO_ID;
+      usarOrdemDecrescente = prefs.getBool(FiltroPage.USAR_ORDEM_DECRESCENTE) ?? false;
+      descricaoController.text = prefs.getString(FiltroPage.CHAVE_FILTRO_DESCRICAO) ?? '';
+    });
+  }
+
   @override
   Widget build (BuildContext context) {
     return WillPopScope(
@@ -33,7 +52,7 @@ class _FiltroPageState extends State<FiltroPage> {
           appBar: AppBar(title: Text('Filtro e Ordenação')),
           body: _criarBody(),
         ),
-        onWillPop: null,
+        onWillPop: onVoltarClick,
     );
   }
 
@@ -49,8 +68,8 @@ class _FiltroPageState extends State<FiltroPage> {
             children: [
               Radio(
                 value: campo,
-                groupValue: _camposParaOrdenacao,
-                onChanged: null,
+                groupValue: campoOrdenacao,
+                onChanged: _onCampoOrdenacaoChanged,
               ),
               Text(_camposParaOrdenacao[campo] ?? ''),
             ],
@@ -60,7 +79,7 @@ class _FiltroPageState extends State<FiltroPage> {
           children: [
             Checkbox(
                 value: usarOrdemDecrescente,
-                onChanged: null,
+                onChanged: _onDecrescenteChanged,
             ),
             Text('Usar ordem decrescente')
           ],
@@ -71,10 +90,36 @@ class _FiltroPageState extends State<FiltroPage> {
           child: TextField(
             decoration: InputDecoration(labelText: 'Descrição começa com'),
             controller: descricaoController,
-            onChanged: null,
+            onChanged: _onFiltroDescricaoChanged,
           ),
         )
       ],
     );
+  }
+
+  Future<bool> onVoltarClick() async {
+    Navigator.of(context).pop(alterouValores);
+    return true;
+  }
+
+  void _onCampoOrdenacaoChanged (String? valor){
+    prefs.setString(FiltroPage.CHAVE_CAMPO_ORDENACAO, valor ?? '');
+    alterouValores = true;
+    setState(() {
+      campoOrdenacao = valor ?? '';
+    });
+  }
+
+  void _onDecrescenteChanged(bool? valor){
+    prefs.setBool(FiltroPage.USAR_ORDEM_DECRESCENTE, valor == true);
+    alterouValores = true;
+    setState(() {
+      usarOrdemDecrescente = valor == true;
+    });
+  }
+
+  void _onFiltroDescricaoChanged(String? valor) {
+    prefs.setString(FiltroPage.CHAVE_FILTRO_DESCRICAO, valor ?? '');
+    alterouValores = true;
   }
 }
