@@ -1,17 +1,28 @@
-# gerenciador_tarefas
+# 🚗 Gerenciador de Tarefas
+## 📱 Projeto Feito em Sala de Aula – Desenvolvimento de Aplicativos Móveis
 
-A new Flutter project.
+Este aplicativo foi desenvolvido durante as aulas da disciplina de Desenvolvimento de Aplicativos Móveis, do Centro Universitário Mater Dei – UNIMATER, utilizando o framework Flutter.
 
-## Getting Started
+O objetivo do projeto é criar um aplicativo simples, funcional e intuitivo para gerenciar tarefas do dia a dia.
 
-This project is a starting point for a Flutter application.
+## ⚙️ Funcionalidades
 
-A few resources to get you started if this is your first Flutter project:
+O aplicativo possui as seguintes funcionalidades:
+- 🗓️ Salvar uma atividade informando sua descrição e data
+- 📃 Filtrar tarefas
+- ⚙️ Escolher os tipos de filtros
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## 🛠 Tecnologias
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+<div align="center">
+  <table>
+    <tr>
+      <th>Flutter</th>
+      <th>Dart</th>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=flutter" alt="Flutter"></a></td>
+      <td align="center"><a href="https://skillicons.dev"><img src="https://skillicons.dev/icons?i=dart" alt="Dart"></a></td>
+    </tr>
+  </table>
+</div>
