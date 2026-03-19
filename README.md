@@ -1,4 +1,4 @@
-# 🚗 Gerenciador de Tarefas
+# 📅 Gerenciador de Tarefas
 ## 📱 Projeto Feito em Sala de Aula – Desenvolvimento de Aplicativos Móveis
 
 Este aplicativo foi desenvolvido durante as aulas da disciplina de Desenvolvimento de Aplicativos Móveis, do Centro Universitário Mater Dei – UNIMATER, utilizando o framework Flutter.
