@@ -6,11 +6,11 @@ class Tarefa {
   static const CAMPO_DESCRICAO = 'descricao';
   static const CAMPO_PRAZO = 'prazo';
 
-  int id;
+  int? id;
   String descricao;
   DateTime? prazo;
 
-  Tarefa({ required this.id, required this.descricao, this.prazo });
+  Tarefa({ this.id, required this.descricao, this.prazo });
 
   String get prazoFormatado {
     if (prazo == null) return '';

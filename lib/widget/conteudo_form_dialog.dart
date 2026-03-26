@@ -87,7 +87,7 @@ class ConteudoFormDialogState extends State<ConteudoFormDialog> {
   bool dadosValidados() => formkey.currentState?.validate() == true;
 
   Tarefa get novaTarefa => Tarefa(
-      id: widget.tarefaAtual?.id ?? 0,
+      id: widget.tarefaAtual?.id ?? null,
       descricao: descricaoController.text,
       prazo: prazoController.text.isEmpty ? null : prazoFormat.parse(prazoController.text)
   );

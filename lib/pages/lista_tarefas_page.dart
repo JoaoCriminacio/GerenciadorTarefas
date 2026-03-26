@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gerenciador_tarefas/dao/tarefa_dao.dart';
 import 'package:gerenciador_tarefas/model/tarefa.dart';
 import 'package:gerenciador_tarefas/pages/filtro_page.dart';
 import 'package:gerenciador_tarefas/widget/conteudo_form_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ListaTarefasPage extends StatefulWidget {
 
@@ -16,6 +18,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
   static const ACAO_DELETAR = 'deletar';
 
   final _tarefas = <Tarefa>[];
+  final _dao = TarefaDao();
 
   var ultimoId = 0;
 
@@ -46,6 +49,12 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
     );
   }
 
+  @override
+  void initState() {
+    super.initState();
+    _atualizarLista();
+  }
+
   Widget _criarBody() {
     if (_tarefas.isEmpty) {
       return Center(
@@ -71,9 +80,9 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
             itemBuilder: (BuildContext context) => criarItemMenuPopup(),
             onSelected: (String valorSelecionado) {
               if (valorSelecionado == ACAO_EDITAR) {
-                _abrirForm(tarefaAtual: tarefa, indice: index);
+                _abrirForm(tarefaAtual: tarefa);
               } else {
-                _excluir(index);
+                _excluir(tarefa);
               }
             },
           );
@@ -111,7 +120,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
     ];
   }
 
-  void _excluir(int index) {
+  void _excluir(Tarefa tarefa) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -134,8 +143,14 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
               TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
-                    setState(() {
-                      _tarefas.removeAt(index);
+                    if (tarefa.id == null) {
+                      return;
+                    }
+
+                    _dao.excluir(tarefa.id!).then((success) {
+                      if (success) {
+                        _atualizarLista();
+                      }
                     });
                   },
                   child: Text('Ok')
@@ -150,12 +165,12 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
     final navigator = Navigator.of(context);
     navigator.pushNamed(FiltroPage.ROUTE_NAME).then((alterouValores) {
       if (alterouValores == true) {
-
+        _atualizarLista();
       }
     });
   }
 
-  void _abrirForm({ Tarefa? tarefaAtual, int? indice }) {
+  void _abrirForm({ Tarefa? tarefaAtual}) {
     final key = GlobalKey<ConteudoFormDialogState>();
     showDialog(
         context: context,
@@ -173,12 +188,11 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
                     if (key.currentState != null && key.currentState!.dadosValidados()) {
                       setState(() {
                         final novaTarefa = key.currentState!.novaTarefa;
-                        if (indice == null) {
-                          novaTarefa.id = ++ultimoId;
-                          _tarefas.add(novaTarefa);
-                        } else {
-                          _tarefas[indice] = novaTarefa;
-                        }
+                        _dao.salvar(novaTarefa).then((success) {
+                          if (success) {
+                            _atualizarLista();
+                          }
+                        });
                       });
                       Navigator.of(context).pop();
                     }
@@ -189,5 +203,24 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
           );
         }
     );
+  }
+
+  void _atualizarLista() async {
+    final prefs = await SharedPreferences.getInstance();
+    final campoOrdenacao = prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? Tarefa.CAMPO_ID;
+    final usaOrdemDecrescente = prefs.getBool(FiltroPage.USAR_ORDEM_DECRESCENTE) ?? true;
+    final filtroDescricao = prefs.getString(FiltroPage.CHAVE_FILTRO_DESCRICAO) ?? '';
+
+    final tarefas = await _dao.listar(
+      filtro: filtroDescricao,
+      campoOrdenacao: campoOrdenacao,
+      usarOrdemDecrescente: usaOrdemDecrescente
+    );
+    setState(() {
+      _tarefas.clear();
+      if (tarefas.isNotEmpty) {
+        _tarefas.addAll(tarefas);
+      }
+    });
   }
 }
