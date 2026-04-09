@@ -19,6 +19,7 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
 
   final _tarefas = <Tarefa>[];
   final _dao = TarefaDao();
+  var _carregando = false;
 
   var ultimoId = 0;
 
@@ -56,6 +57,32 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
   }
 
   Widget _criarBody() {
+    if (_carregando) {
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: CircularProgressIndicator(),
+          ),
+          Align(
+            alignment: AlignmentDirectional.center,
+            child: Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Text(
+                  'Carregando suas tarefas',
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColor,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold
+                  )
+              ),
+            ),
+          )
+        ],
+      );
+    }
+
     if (_tarefas.isEmpty) {
       return Center(
         child: Text(
@@ -74,7 +101,22 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
           final tarefa = _tarefas[index];
           return PopupMenuButton(
             child: ListTile(
-              title: Text('${tarefa.id} - ${tarefa.descricao}'),
+              leading: Checkbox(
+                value: tarefa.finalizada,
+                onChanged: (bool? checked) {
+                  setState(() {
+                    tarefa.finalizada = checked == true;
+                  });
+                  _dao.salvar(tarefa);
+                },
+              ),
+              title: Text(
+                '${tarefa.id} - ${tarefa.descricao}',
+                style: TextStyle(
+                  decoration: tarefa.finalizada ? TextDecoration.lineThrough : null,
+                  color: tarefa.finalizada ? Colors.grey : null,
+                ),
+              ),
               subtitle: Text(tarefa.prazo != null ? 'Prazo: ${tarefa.prazoFormatado}' : ''),
             ),
             itemBuilder: (BuildContext context) => criarItemMenuPopup(),
@@ -206,6 +248,10 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
   }
 
   void _atualizarLista() async {
+    setState(() {
+      _carregando = true;
+    });
+
     final prefs = await SharedPreferences.getInstance();
     final campoOrdenacao = prefs.getString(FiltroPage.CHAVE_CAMPO_ORDENACAO) ?? Tarefa.CAMPO_ID;
     final usaOrdemDecrescente = prefs.getBool(FiltroPage.USAR_ORDEM_DECRESCENTE) ?? true;
@@ -216,11 +262,13 @@ class _ListaTarefasPageState extends State<ListaTarefasPage> {
       campoOrdenacao: campoOrdenacao,
       usarOrdemDecrescente: usaOrdemDecrescente
     );
+
     setState(() {
       _tarefas.clear();
       if (tarefas.isNotEmpty) {
         _tarefas.addAll(tarefas);
       }
+      _carregando = false;
     });
   }
 }

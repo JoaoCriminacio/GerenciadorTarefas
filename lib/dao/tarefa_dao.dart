@@ -54,7 +54,12 @@ class TarefaDao {
     final db = await dbProvider.database;
     final resultado = await db.query(
       Tarefa.NOME_TABELA,
-      columns: [Tarefa.CAMPO_ID, Tarefa.CAMPO_DESCRICAO, Tarefa.CAMPO_PRAZO],
+      columns: [
+        Tarefa.CAMPO_ID,
+        Tarefa.CAMPO_DESCRICAO,
+        Tarefa.CAMPO_PRAZO,
+        Tarefa.CAMPO_FINALIZADA
+      ],
       where: where,
       orderBy: orderBy
     );

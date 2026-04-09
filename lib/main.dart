@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       title: 'Gerenciador de Tarefas',
       theme: ThemeData(
         colorScheme: .fromSeed(seedColor: Colors.deepPurple),
+        primaryColor: Colors.black,
       ),
       home: ListaTarefasPage(),
       routes: {
